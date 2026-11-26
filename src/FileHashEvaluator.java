@@ -1,3 +1,5 @@
+import javax.swing.*;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -7,36 +9,43 @@ import java.util.Scanner;
 
 public class FileHashEvaluator
 {
-    public static String calculateFileHash(String filePath, String
-            algorithm)
-            throws NoSuchAlgorithmException, IOException {
+    public static String selectFileWithPopup() {
+        try
+        {
+            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+        }
+        catch (Exception e)
+        {
+            // Fallback to default Java look if system look fails
+        }
+        JFileChooser fileChooser = new JFileChooser();
+        fileChooser.setDialogTitle("Select a file to hash");
+        fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
 
-        MessageDigest digest = MessageDigest.getInstance(algorithm); // [1]
+        System.out.println("Opening file chooser window... Check your taskbar if it doesn't pop up immediately.");
+        int response = fileChooser.showOpenDialog(null);
+        if (response == JFileChooser.APPROVE_OPTION)
+        {
+            File selectedFile = fileChooser.getSelectedFile();
+            return selectedFile.getAbsolutePath();
+        }//if
+        return null;
+    }//selectFileWithPopup
 
-        // Use a buffer so we don't load the entire file into memory atonce
+    public static String calculateFileHash(String filePath, String algorithm) throws NoSuchAlgorithmException, IOException {
 
-        byte[] buffer = new byte[8192];
+        MessageDigest digest = MessageDigest.getInstance(algorithm);
+        byte[] buffer = new byte[8192]; // читаем файл блоками по 8 КБ
         int bytesRead;
-
         try (InputStream fis = new FileInputStream(filePath))
         {
             while ((bytesRead = fis.read(buffer)) != -1)
-                digest.update(buffer, 0, bytesRead); // [1]
-
+                digest.update(buffer, 0, bytesRead);
         }
-        // Complete the hash computation
-        byte[] hashBytes = digest.digest(); // [1]
-        // Convert the byte array into a readable Hexadecimal string
-        StringBuilder hexString = new StringBuilder();
-        for (byte b : hashBytes)
-        {
-            String hex = Integer.toHexString(0xff & b);
-            if (hex.length() == 1)
-                hexString.append('0');
+        StringBuilder hex = new StringBuilder();
+        for (byte b : digest.digest())
+            hex.append(String.format("%02x", b));
 
-            hexString.append(hex);
-        }//for
-
-        return hexString.toString();
+        return hex.toString();
     }//calculateFileHash
 }//FileHashEvaluator
