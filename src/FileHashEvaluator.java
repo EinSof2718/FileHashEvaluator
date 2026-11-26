@@ -1,4 +1,7 @@
 import javax.swing.*;
+import java.awt.*;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.StringSelection;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -7,8 +10,10 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Scanner;
 
-public class FileHashEvaluator {
-    public static String calculateFileHash(String filePath, String algorithm) throws NoSuchAlgorithmException, IOException {
+public class FileHashEvaluator
+{
+    public static String calculateFileHash(String filePath, String algorithm) throws NoSuchAlgorithmException, IOException
+    {
 
         MessageDigest digest = MessageDigest.getInstance(algorithm);
         byte[] buffer = new byte[8192]; // читаем файл блоками по 8 КБ
@@ -24,4 +29,12 @@ public class FileHashEvaluator {
 
         return hex.toString();
     }//calculateFileHash
+
+
+    public static void copyToClipboard(String text)
+    {
+        StringSelection selection = new StringSelection(text);
+        Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+        clipboard.setContents(selection, null);
+    }//copyToClipboard
 }//FileHashEvaluator

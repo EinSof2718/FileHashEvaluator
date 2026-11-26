@@ -4,8 +4,10 @@ import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.util.Scanner;
 
-public class Main {
-    void main(String[] args) {
+public class Main
+{
+    void main(String[] args)
+    {
         try
         {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
@@ -43,7 +45,8 @@ public class Main {
         try
         {
             String hashResult = FileHashEvaluator.calculateFileHash(selectedFile.getAbsolutePath(), selectedAlgorithm);
-            String resultMessage = String.format("File: %s\n\nAlgorithm: %s\n\nHash Result%s:\n%s", selectedFile.getName(), selectedAlgorithm, "", hashResult);
+            FileHashEvaluator.copyToClipboard(hashResult);
+            String resultMessage = String.format("File: %s\n\nAlgorithm: %s\n\nHash Result%s:\n%s", selectedFile.getName(), selectedAlgorithm, " (copied to clipboard)", hashResult);
             JOptionPane.showMessageDialog(null, resultMessage,"Hash Computation Complete", JOptionPane.INFORMATION_MESSAGE);
         }
         catch (NoSuchAlgorithmException e)
