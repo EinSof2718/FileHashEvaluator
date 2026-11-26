@@ -7,31 +7,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Scanner;
 
-public class FileHashEvaluator
-{
-    public static String selectFileWithPopup() {
-        try
-        {
-            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-        }
-        catch (Exception e)
-        {
-            // Fallback to default Java look if system look fails
-        }
-        JFileChooser fileChooser = new JFileChooser();
-        fileChooser.setDialogTitle("Select a file to hash");
-        fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
-
-        System.out.println("Opening file chooser window... Check your taskbar if it doesn't pop up immediately.");
-        int response = fileChooser.showOpenDialog(null);
-        if (response == JFileChooser.APPROVE_OPTION)
-        {
-            File selectedFile = fileChooser.getSelectedFile();
-            return selectedFile.getAbsolutePath();
-        }//if
-        return null;
-    }//selectFileWithPopup
-
+public class FileHashEvaluator {
     public static String calculateFileHash(String filePath, String algorithm) throws NoSuchAlgorithmException, IOException {
 
         MessageDigest digest = MessageDigest.getInstance(algorithm);

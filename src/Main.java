@@ -1,42 +1,58 @@
+import javax.swing.*;
+import java.io.File;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.util.Scanner;
 
 public class Main {
     void main(String[] args) {
-        Scanner scanner = new Scanner(System.in);
-
-        String filePath = FileHashEvaluator.selectFileWithPopup();
-        if (filePath == null)
+        try
         {
-            System.out.println("No file was selected. Exiting program.");
-            scanner.close();
-            return;
+            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
         }
-        System.out.println("Selected file: " + filePath);
+        catch (Exception e)
+        {
+            // Fallback to default Java style if system look fails
+        }
 
-        System.out.print("Enter the algorithm (e.g., SHA-256, MD5, SHA-1): ");
-        String algorithm = scanner.nextLine().trim();
+        // 1. Выбор файла
+        JFileChooser fileChooser = new JFileChooser();
+        fileChooser.setDialogTitle("Step 1: Select a file to hash");
+        fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
 
-        try {
-            System.out.println("\nCalculating hash... Please wait.");
-            String hashResult = FileHashEvaluator.calculateFileHash(filePath, algorithm);
+        int fileResponse = fileChooser.showOpenDialog(null);
+        if (fileResponse != JFileChooser.APPROVE_OPTION)
+        {
+            JOptionPane.showMessageDialog(null, "No file selected. Exiting program.","Cancelled", JOptionPane.WARNING_MESSAGE);
+            return;
+        }//if
 
-            System.out.println("\n--- Results ---");
-            System.out.println("File: " + filePath);
-            System.out.println(algorithm.toUpperCase() + " Hash: " + hashResult);
+        File selectedFile = fileChooser.getSelectedFile();
+
+        // 2. Выбор алгоритма из выпадающего списка
+        String[] algorithms = {"SHA-256", "MD5", "SHA-1", "SHA-512", "SHA-384"};
+        String selectedAlgorithm = (String) JOptionPane.showInputDialog(null,"Step 2: Choose the hash algorithm to apply:","Select Algorithm",JOptionPane.QUESTION_MESSAGE,null,algorithms, algorithms[0]);
+
+        if (selectedAlgorithm == null)
+        {
+            JOptionPane.showMessageDialog(null, "No algorithm chosen. Exiting program.","Cancelled", JOptionPane.WARNING_MESSAGE);
+            return;
+        }//if
+
+        // 3. Вычисление и вывод
+        try
+        {
+            String hashResult = FileHashEvaluator.calculateFileHash(selectedFile.getAbsolutePath(), selectedAlgorithm);
+            String resultMessage = String.format("File: %s\n\nAlgorithm: %s\n\nHash Result%s:\n%s", selectedFile.getName(), selectedAlgorithm, "", hashResult);
+            JOptionPane.showMessageDialog(null, resultMessage,"Hash Computation Complete", JOptionPane.INFORMATION_MESSAGE);
         }
         catch (NoSuchAlgorithmException e)
         {
-            System.err.println("Error: The algorithm '" + algorithm + "' is not supported.");
+            JOptionPane.showMessageDialog(null, "The algorithm is not supported.","Error", JOptionPane.ERROR_MESSAGE);
         }
         catch (IOException e)
         {
-            System.err.println("Error reading the file: " + e.getMessage());
-        }
-        finally
-        {
-            scanner.close();
+            JOptionPane.showMessageDialog(null, "Error reading file: " + e.getMessage(),"Error", JOptionPane.ERROR_MESSAGE);
         }
    }//main
 }
